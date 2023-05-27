@@ -154,7 +154,9 @@ EOF  all  create  destroy  help  quit  show  update
 No known bugs at this time. 
 
 ## Authors
-lil-armstrong - [Github](https://github.com/lil-armstrong) 
+  
+lil-armstrong - [Github](https://github.com/lil-armstrong)
+  
 Ebuka Obobo - [Github](https://github.com/king-obobo) 
 
 ## License
