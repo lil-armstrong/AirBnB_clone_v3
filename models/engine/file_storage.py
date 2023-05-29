@@ -71,7 +71,7 @@ class FileStorage:
 
     def get(self, cls, id):
         """Returns the object based on the class and its ID, or None"""
-        if cls in classes.values() and id and typr(id) == str:
+        if cls in classes.values() and id and type(id) == str:
             all_obj = self.all(cls)
             for key, value in all_obj.items():
                 if key.split(".")[1] == id:
@@ -84,5 +84,3 @@ class FileStorage:
         if cls in classes.values():
             all_obj = self.all(cls)
         return len(all_obj)
-
-

@@ -3,7 +3,6 @@
 Contains the class DBStorage
 """
 
-import models
 from models.amenity import Amenity
 from models.base_model import BaseModel, Base
 from models.city import City
@@ -12,7 +11,6 @@ from models.review import Review
 from models.state import State
 from models.user import User
 from os import getenv
-import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -32,23 +30,41 @@ class DBStorage:
         HBNB_MYSQL_HOST = getenv('HBNB_MYSQL_HOST')
         HBNB_MYSQL_DB = getenv('HBNB_MYSQL_DB')
         HBNB_ENV = getenv('HBNB_ENV')
+
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.
                                       format(HBNB_MYSQL_USER,
                                              HBNB_MYSQL_PWD,
                                              HBNB_MYSQL_HOST,
                                              HBNB_MYSQL_DB))
+
         if HBNB_ENV == "test":
-            Base.metadata.drop_all(self.__engine)
+            # print(Base.__dict__)
+            self.drop_all()
+
+    def drop_all(self):
+        """Drop the database"""
+        Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """query on the current database session"""
         new_dict = {}
-        for clss in classes:
-            if cls is None or cls is classes[clss] or cls is clss:
-                objs = self.__session.query(classes[clss]).all()
+
+        if cls is None:
+            for clss in classes:
+                objs = self.__session.query(classes.get(clss)).all()
                 for obj in objs:
-                    key = obj.__class__.__name__ + '.' + obj.id
+                    key = DBStorage.makeKey(obj.__class__.__name__, obj.id)
                     new_dict[key] = obj
+        else:
+            if isinstance(cls, str):
+                cls = classes.get(cls)
+            if cls:
+                objs = self.__session.query(cls).all()
+                print(objs)
+                for obj in objs:
+                    key = DBStorage.makeKey(obj.__class__.__name__, obj.id)
+                    new_dict[key] = obj
+
         return (new_dict)
 
     def new(self, obj):
@@ -57,8 +73,8 @@ class DBStorage:
 
     def get(self, cls, id):
         """Returns the object based on the class and its ID, or None"""
-        if cls in classes.values() and id and typr(id) == str:
-            all_obj = self.all(cls)
+        all_obj = self.all(cls)
+        if cls in classes.values() and id and type(id) == str:
             for key, value in all_obj.items():
                 if key.split(".")[1] == id:
                     return value
@@ -67,8 +83,6 @@ class DBStorage:
     def count(self, cls=None):
         """A method to count the number of objects in storage"""
         all_obj = self.all(cls)
-        if cls in classes.values():
-            all_obj = self.all(cls)
         return len(all_obj)
 
     def save(self):
@@ -90,3 +104,8 @@ class DBStorage:
     def close(self):
         """call remove() method on the private session attribute"""
         self.__session.remove()
+
+    @staticmethod
+    def makeKey(cls_name, id):
+        """Generates a storage key using the class name and id"""
+        return "{}.{}".format(cls_name, id)
