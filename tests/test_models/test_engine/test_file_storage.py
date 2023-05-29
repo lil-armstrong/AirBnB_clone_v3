@@ -149,7 +149,7 @@ class TestGetMethod(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_correctness(self):
-        """Test that the correct object is retrieved when the correct class and ID are passed"""
+        """Test that the correct object is retrieved"""
         model = BaseModel
         inst = BaseModel()
         id = inst.id

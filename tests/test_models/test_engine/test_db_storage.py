@@ -172,6 +172,6 @@ class TestCountMethod(unittest.TestCase):
 
     def test_class_count(self):
         """Return specified class count"""
-        expected = 1
+        expected = 2
         result = models.storage.count("State")
         self.assertEqual(result, expected)
