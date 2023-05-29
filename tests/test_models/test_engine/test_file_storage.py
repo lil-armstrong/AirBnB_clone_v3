@@ -113,3 +113,48 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+
+class TestGetMethod(unittest.TestCase):
+    @classmethod
+    def setUp(self):
+        try:
+            os.rename("file.json", "tmp")
+        except IOError:
+            pass
+        FileStorage.__objects = {}
+
+    @classmethod
+    def tearDown(self):
+        try:
+            os.remove("file.json")
+            os.rename("tmp", "file.json")
+        except IOError:
+            pass
+
+    def test_invalid_class(self):
+        """Return None if given classname does is invalid"""
+        model = "BModel"
+        id = '74220232-66f4-4a70-af13-0adf796f9edf'
+        expected = None
+        result = models.storage.get(model, id)
+        self.assertEqual(result, expected)
+
+    def test_incorrect_id(self):
+        """Return None if the ID is incorrect"""
+        model = "BaseModel"
+        id = "74220232-66f4-4a70-af13-0adf796f9edf"
+        expected = None
+        result = models.storage.get(model, id)
+        self.assertEqual(result, expected)
+
+    def test_correctness(self):
+        """Test that the correct object is retrieved"""
+        model = BaseModel
+        inst = BaseModel()
+        id = inst.id
+        inst.save()
+        all = models.storage.all()
+        result = models.storage.get(model, id)
+        expected = id
+        self.assertEqual(expected, result.id)
